@@ -1,0 +1,44 @@
+<html>
+
+
+<body>
+<input type="text" placeholder="type send message." class="content">
+<button type="button" value="send" class="sendBtn" onclick="sendMsg()">send</button>
+<div>
+    <span>message</span>
+    <div class="msgArea"></div>
+</div>
+</body>
+<script>
+    // let socket = new WebSocket("ws://localhost:8080/websocket");
+    let socket = new WebSocket("ws://localhost:8081/websocket");
+
+    socket.onopen = function (e) {
+        console.log('open server!')
+    };
+
+    socket.onerror = function (e) {
+        console.log(e);
+    }
+
+    socket.onmessage = function (e) {
+        console.log(e.data);
+        let msgArea = document.querySelector('.msgArea');
+        let newMsg = document.createElement('div');
+        newMsg.innerText = e.data;
+        msgArea.append(newMsg);
+    }
+
+    function sendMsg() {
+        let content = document.querySelector('.content').value;
+        document.querySelector('.content').value = '';
+        socket.send(content);
+    }
+
+    document.querySelector('.content').addEventListener('keyup', (e) => {
+        if (e.keyCode === 13) {
+            sendMsg();
+        }
+    })
+</script>
+</html>
