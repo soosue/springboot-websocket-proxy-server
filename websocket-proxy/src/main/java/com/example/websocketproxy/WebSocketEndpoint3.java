@@ -6,27 +6,36 @@ import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
-@ServerEndpoint("/jupyter/{serverCode}/terminals/websocket/{code}")
+@ServerEndpoint("/jupyter/{serverCode}/api/kernels/{id}/channels")
 @Component
-public class WebSocketEndpoint {
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketEndpoint.class);
+public class WebSocketEndpoint3 {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketEndpoint3.class);
 
     private static final StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
 
     private WebSocketSession serverWsSession;
 
     @OnOpen
-    public void onOpen(Session browserSession, @PathParam("serverCode") String serverCode, @PathParam("code") String code) throws Exception {
+    public void onOpen(Session browserSession, @PathParam("serverCode") String serverCode, @PathParam("id") String id) throws Exception {
         logger.info("connected with browser. sessionId: {}", browserSession.getId());
-        String path = browserSession.getRequestURI().getPath().replace("{serverCode}", serverCode).replace("{code}", code);
+        String path = browserSession.getRequestURI().getPath()
+                .replace("{serverCode}", serverCode)
+                .replace("{id}", id);
+
+        Map<String, List<String>> requestParameterMap = browserSession.getRequestParameterMap();
+        path += "?session_id=" + requestParameterMap.get("session_id").get(0);
+
         if (serverWsSession == null) {
-            serverWsSession = webSocketClient.execute(new ServerWebSocketHandler(browserSession), "ws://211.42.179.152:50002" + path).get();
+            serverWsSession = webSocketClient.execute(new ServerWebSocketHandler(browserSession), "ws://211.42.179.151:50200" + path).get();
         }
     }
 

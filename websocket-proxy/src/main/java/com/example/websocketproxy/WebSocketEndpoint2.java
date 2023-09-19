@@ -12,21 +12,21 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.io.IOException;
 
-@ServerEndpoint("/jupyter/{serverCode}/terminals/websocket/{code}")
+    @ServerEndpoint("/jupyter/{serverCode}/api/events/subscribe")
 @Component
-public class WebSocketEndpoint {
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketEndpoint.class);
+public class WebSocketEndpoint2 {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketEndpoint2.class);
 
     private static final StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
 
     private WebSocketSession serverWsSession;
 
     @OnOpen
-    public void onOpen(Session browserSession, @PathParam("serverCode") String serverCode, @PathParam("code") String code) throws Exception {
+    public void onOpen(Session browserSession, @PathParam("serverCode") String serverCode) throws Exception {
         logger.info("connected with browser. sessionId: {}", browserSession.getId());
-        String path = browserSession.getRequestURI().getPath().replace("{serverCode}", serverCode).replace("{code}", code);
+        String path = browserSession.getRequestURI().getPath().replace("{serverCode}", serverCode);
         if (serverWsSession == null) {
-            serverWsSession = webSocketClient.execute(new ServerWebSocketHandler(browserSession), "ws://211.42.179.152:50002" + path).get();
+            serverWsSession = webSocketClient.execute(new ServerWebSocketHandler(browserSession), "ws://211.42.179.151:50200" + path).get();
         }
     }
 
